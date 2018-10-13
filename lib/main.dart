@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:screensee/screenshare/screenshare.dart';
+import 'package:flutter/services.dart';
+import 'package:screensee/create/create.dart';
+import 'package:screensee/join/join.dart';
+import 'package:screensee/welcome/actions.dart';
 
-void main() => runApp(new MyApp());
+void main() {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(MyApp());
+  });
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -24,9 +32,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
-    return ScreenShare();
+    return ActionsPage(
+      joinRoom: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => JoinPage()));
+      },
+      createRoom: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatePage()));
+      },
+    );
   }
 }
