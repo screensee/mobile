@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:screensee/cookie.dart';
 import 'package:screensee/errors.dart';
 import 'package:screensee/room.dart';
-import 'package:screensee/user.dart';
 
 class CreatePresenter {
   final CookieStorage cookieStorage;
@@ -33,12 +32,7 @@ class CreatePresenter {
         throw ApiException();
       }
 
-      final room = Room(
-        roomJson["data"]["id"],
-        (roomJson["data"]["participants"] as List).map((item) => User(item)).toList(),
-        roomJson["data"]["videoLink"],
-        roomJson["data"]["pseudonym"],
-      );
+      final room = parseFromJson(roomJson);
 
       view?.openRoom(room);
     } catch (e) {

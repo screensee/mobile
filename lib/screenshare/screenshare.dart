@@ -42,7 +42,7 @@ class _ScreenShareState extends State<ScreenShare> {
     return Scaffold(
       backgroundColor: Colors.black38,
       appBar: AppBar(
-        title: Text(widget.room.id),
+        title: Text(widget.room.pseudonym),
       ),
       body: _buildBody(),
     );

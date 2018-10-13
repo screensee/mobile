@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:screensee/cookie.dart';
+import 'package:screensee/join/join_presenter.dart';
+import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/screenshare.dart';
 
-class JoinPage extends StatelessWidget {
+class JoinPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _JoinPageState();
+}
+
+class _JoinPageState extends State<JoinPage> implements JoinView {
+  JoinPresenter presenter;
+  ViewModel model;
+
+  @override
+  void initState() {
+    presenter = JoinPresenter(CookieStorage());
+    model = ViewModel();
+
+    presenter.view = this;
+    
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,26 +33,25 @@ class JoinPage extends StatelessWidget {
             constraints: BoxConstraints(maxWidth: 300.0),
             child: Form(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  TextFormField(
+                  TextField(
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(), hintText: "Room Id"),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter the chat room.';
-                      }
+                        border: OutlineInputBorder(), labelText: "Room Name"),
+                    onChanged: (value) {
+                      setState(() {
+                        model.roomId = value;
+                      });
                     },
                   ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: RaisedButton(
-                      child: Text("Proceed"),
-                      onPressed: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => ScreenShare())
-                        );
-                      },
-                    ),
+                  RaisedButton(
+                    child: Container(
+                        width: 300.0, child: Center(child: Text("JOIN"))),
+                    onPressed: model.roomId.isNotEmpty
+                        ? () {
+                            presenter.joinRoom(model.roomId);
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -41,6 +61,20 @@ class JoinPage extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  void openRoom(Room room) {
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => ScreenShare(room: room)));
+  }
+
+  @override
+  void showError() {}
+
+  @override
+  void showProgress() {}
 }
 
-class JoinBloc {}
+class ViewModel {
+  String roomId = "";
+}

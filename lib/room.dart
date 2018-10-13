@@ -8,3 +8,12 @@ class Room {
 
   Room(this.id, this.participants, this.videoLink, this.pseudonym);
 }
+
+Room parseFromJson(dynamic json) {
+  return Room(
+    json["data"]["id"],
+    (json["data"]["participants"] as List).map((item) => User(item)).toList(),
+    json["data"]["videoLink"],
+    json["data"]["pseudonym"],
+  );
+}
