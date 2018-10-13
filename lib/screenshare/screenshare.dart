@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:screensee/screenshare/chat.dart';
 import 'package:screensee/screenshare/player.dart';
 import 'package:screensee/screenshare/resolver.dart';
 
@@ -8,19 +9,22 @@ class ScreenShare extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: FutureBuilder(
-        future: YoutubeUrlResolver().resolve(VIDEO_URL),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                return _buildError();
-              }
-              return _buildScreen(snapshot.data);
-            default:
-              return SizedBox();
-          }
-        },
+      child: Scaffold(
+        backgroundColor: Colors.black38,
+        body: FutureBuilder(
+          future: YoutubeUrlResolver().resolve(VIDEO_URL),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                if (snapshot.hasError) {
+                  return _buildError();
+                }
+                return _buildScreen(snapshot.data);
+              default:
+                return SizedBox();
+            }
+          },
+        ),
       ),
     );
   }
@@ -29,6 +33,9 @@ class ScreenShare extends StatelessWidget {
     return Column(
       children: <Widget>[
         Player(data),
+        Expanded(
+          child: Chat(),
+        ),
       ],
     );
   }
