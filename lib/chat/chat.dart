@@ -70,6 +70,7 @@ class _ChatState extends State<Chat> implements ChatView {
         children: <Widget>[
           Expanded(
             child: TextField(
+              enabled: !viewModel.messageProgress,
               controller: textController,
               onChanged: (value) {
                 setState(() {
