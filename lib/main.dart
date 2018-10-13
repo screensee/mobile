@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:screensee/playback/player.dart';
+import 'package:screensee/screenshare/screenshare.dart';
 
 void main() => runApp(new MyApp());
 
@@ -27,6 +27,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Player();
+    return ScreenShare();
   }
 }

@@ -1,13 +1,10 @@
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
-const VIDEO_URL =
-    "https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4";
-
 class Player extends StatefulWidget {
   final String videoUrl;
 
-  const Player({Key key, this.videoUrl}) : super(key: key);
+  const Player(this.videoUrl, {Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PlayerState();
@@ -18,7 +15,7 @@ class _PlayerState extends State<Player> {
 
   @override
   void initState() {
-    _controller = VideoPlayerController.network(VIDEO_URL)
+    _controller = VideoPlayerController.network(widget.videoUrl)
       ..addListener(() {})
       ..initialize().then((_) {
         setState(() {
@@ -31,7 +28,7 @@ class _PlayerState extends State<Player> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: _createVideoWidget());
+    return _createVideoWidget();
   }
 
   _createVideoWidget() => _controller.value.initialized
