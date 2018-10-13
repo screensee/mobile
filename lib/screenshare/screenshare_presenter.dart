@@ -1,18 +1,23 @@
+import 'dart:convert';
+
+import 'package:screensee/cookie.dart';
 import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/resolver.dart';
+import 'package:http/http.dart' as http;
 
 class ScreensharePresenter {
   final UrlResolver resolver;
+  final CookieStorage cookieStorage;
 
   ScreenShareView view;
   Room room;
 
-  ScreensharePresenter(this.resolver);
+  ScreensharePresenter(this.resolver, this.cookieStorage);
 
   void initRoom(Room room) async {
     this.room = room;
 
-    view?.showProgress();    
+    view?.showProgress();
 
     try {
       await _resolveUrl();
@@ -28,10 +33,29 @@ class ScreensharePresenter {
   }
 
   _resolveUrl() async {
+    view?.showPlayerProgress();
     if (hasLink) {
       final url = await resolver.resolve(room.videoLink);
       view?.showPlayer(url);
     } else {
+      view?.showWithoutPlayer();
+    }
+  }
+
+  void refresh() async {
+    view?.showPlayerProgress();
+    try {
+      final response = await http.get(
+        "http://185.143.145.119/b/rooms/id/${room.id}",
+        headers: {
+          "Cookie": await cookieStorage.readCookies()
+        }
+      );
+
+      final roomJson = json.decode(response.body);
+      room = parseFromJson(roomJson);
+      await _resolveUrl();
+    } catch (e) {
       view?.showWithoutPlayer();
     }
   }
@@ -43,6 +67,7 @@ abstract class ScreenShareView {
   void showProgress();
   void showError();
 
+  void showPlayerProgress();
   void showWithoutPlayer();
   void showPlayer(String url);
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:screensee/chat/chat_presenter.dart';
 import 'package:screensee/chat/message.dart';
 import 'package:screensee/cookie.dart';
@@ -82,6 +81,7 @@ class _ChatState extends State<Chat> implements ChatView {
                 color: Colors.white,
               ),
               decoration: InputDecoration(
+                border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
                 hintText: "Message",
                 hintStyle: TextStyle(color: Colors.white54),
               ),

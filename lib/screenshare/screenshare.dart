@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:screensee/chat/chat.dart';
+import 'package:screensee/cookie.dart';
 import 'package:screensee/player/player.dart';
 import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/resolver.dart';
@@ -16,13 +17,18 @@ class ScreenShare extends StatefulWidget {
 
 class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   final YoutubeUrlResolver urlResolver = YoutubeUrlResolver();
+  final CookieStorage cookieStorage = CookieStorage();
 
   ScreensharePresenter presenter;
   WidgetBuilder currentBuilder;
 
+  TextEditingController youtubeLinkController;
+
   @override
   void initState() {
-    presenter = ScreensharePresenter(urlResolver);
+    presenter = ScreensharePresenter(urlResolver, cookieStorage);
+    youtubeLinkController = TextEditingController();
+
     currentBuilder = (context) {
       return Center(child: CircularProgressIndicator());
     };
@@ -74,7 +80,52 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   void showWithoutPlayer() {
     setState(() {
       currentBuilder = (context) {
-        return Chat(room: widget.room);
+        return Column(
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Container(
+                color: Color(0xff333333),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          controller: youtubeLinkController,
+                          decoration: InputDecoration(
+                              border: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white)),
+                              hintText: "Set a valid YouTube url",
+                              hintStyle: TextStyle(color: Colors.white54)),
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.check),
+                        color: Colors.white,
+                        onPressed: () {
+                          presenter
+                              .updateLink(youtubeLinkController.value.text);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.refresh),
+                        color: Colors.white,
+                        onPressed: () {
+                          presenter.refresh();
+                        },
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(child: Chat(room: widget.room)),
+          ],
+        );
       };
     });
   }
@@ -88,5 +139,23 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
         );
       };
     });
+  }
+
+  @override
+  void showPlayerProgress() {
+    currentBuilder = (context) {
+      return Column(
+        children: <Widget>[
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Container(
+              color: Color(0xff333333),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ),
+          Expanded(child: Chat(room: widget.room)),
+        ],
+      );
+    };
   }
 }
