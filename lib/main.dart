@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:screensee/cookie.dart';
 import 'package:screensee/create/create.dart';
 import 'package:screensee/join/join.dart';
 import 'package:screensee/user.dart';
@@ -38,7 +39,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    provider = ScreenShareUserProvider();
+    provider = ScreenShareUserProvider(
+      CookieStorage());
     super.initState();
   }
 

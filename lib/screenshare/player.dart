@@ -36,5 +36,11 @@ class _PlayerState extends State<Player> {
           aspectRatio: _controller.value.aspectRatio,
           child: VideoPlayer(_controller),
         )
-      : SizedBox();
+      : AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Container(
+            color: Color(0xff1a1a1a),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        );
 }
