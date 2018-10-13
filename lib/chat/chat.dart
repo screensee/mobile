@@ -27,6 +27,7 @@ class _ChatState extends State<Chat> implements ChatView {
   @override
   void initState() {
     presenter = ChatPresenter(storage);
+    scrollController = ScrollController();
 
     viewModel = ViewModel();
     textController = TextEditingController();

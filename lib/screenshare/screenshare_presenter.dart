@@ -26,10 +26,15 @@ class ScreensharePresenter {
     }
   }
 
-  void updateLink(String link) {
-    room = Room(room.id, room.participants, link, room.pseudonym);
+  void updateLink(String link) async {
+    final result = await http.post("http://185.143.145.119/b/rooms/update",
+        headers: {"Cookie": await cookieStorage.readCookies()},
+        body: {"roomId": room.id, "videoLink": link});
 
-    _resolveUrl();
+    final resultJson = json.decode(result.body);
+    room = parseFromJson(resultJson);
+
+    await _resolveUrl();
   }
 
   _resolveUrl() async {
@@ -46,11 +51,8 @@ class ScreensharePresenter {
     view?.showPlayerProgress();
     try {
       final response = await http.get(
-        "http://185.143.145.119/b/rooms/id/${room.id}",
-        headers: {
-          "Cookie": await cookieStorage.readCookies()
-        }
-      );
+          "http://185.143.145.119/b/rooms/id/${room.id}",
+          headers: {"Cookie": await cookieStorage.readCookies()});
 
       final roomJson = json.decode(response.body);
       room = parseFromJson(roomJson);
