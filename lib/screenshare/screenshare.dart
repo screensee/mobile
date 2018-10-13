@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:screensee/chat/chat.dart';
 import 'package:screensee/player/player.dart';
 import 'package:screensee/room.dart';
-import 'package:screensee/screenshare/chat.dart';
 import 'package:screensee/screenshare/resolver.dart';
 import 'package:screensee/screenshare/screenshare_presenter.dart';
 
@@ -62,7 +62,7 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
           children: <Widget>[
             Player(url),
             Expanded(
-              child: Chat(),
+              child: Chat(room: widget.room),
             ),
           ],
         );
@@ -74,7 +74,7 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   void showWithoutPlayer() {
     setState(() {
       currentBuilder = (context) {
-        return Chat();
+        return Chat(room: widget.room);
       };
     });
   }

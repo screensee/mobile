@@ -3,16 +3,22 @@ import 'package:screensee/screenshare/resolver.dart';
 
 class ScreensharePresenter {
   final UrlResolver resolver;
+
   ScreenShareView view;
   Room room;
 
   ScreensharePresenter(this.resolver);
 
-  void initRoom(Room room) {
+  void initRoom(Room room) async {
     this.room = room;
 
-    view?.showProgress();
-    _resolveUrl();
+    view?.showProgress();    
+
+    try {
+      await _resolveUrl();
+    } catch (e) {
+      view?.showError();
+    }
   }
 
   void updateLink(String link) {
@@ -22,15 +28,11 @@ class ScreensharePresenter {
   }
 
   _resolveUrl() async {
-    try {
-      if (hasLink) {
-        final url = await resolver.resolve(room.videoLink);
-        view?.showPlayer(url);
-      } else {
-        view?.showWithoutPlayer();
-      }
-    } catch (e) {
-      view?.showError();
+    if (hasLink) {
+      final url = await resolver.resolve(room.videoLink);
+      view?.showPlayer(url);
+    } else {
+      view?.showWithoutPlayer();
     }
   }
 
