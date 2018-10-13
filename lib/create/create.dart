@@ -67,15 +67,17 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
                         ? Positioned(
                             right: 15.0,
                             child: SizedBox(
-                              width: 15.0,
-                              height: 15.0,
-                              child: CircularProgressIndicator()),
+                                width: 15.0,
+                                height: 15.0,
+                                child: CircularProgressIndicator()),
                           )
                         : SizedBox()
                   ],
                 )),
             onPressed: !model.isProgress
                 ? () {
+                    model.isProgress = false;
+                    model.isError = false;
                     presenter.createRoom(
                         link: model.link, password: model.password);
                   }
@@ -90,15 +92,17 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
   void openRoom(Room room) {
     setState(() {
       model.isProgress = false;
+      model.isError = false;
     });
 
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => ScreenShare()));
+        MaterialPageRoute(builder: (context) => ScreenShare(room: room)));
   }
 
   @override
   void showError() {
     setState(() {
+      model.isError = true;
       model.isProgress = false;
     });
   }
@@ -106,6 +110,7 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
   @override
   void showProgress() {
     setState(() {
+      model.isError = false;
       model.isProgress = true;
     });
   }
@@ -115,5 +120,6 @@ class ViewModel {
   String link;
   String password;
 
+  bool isError = false;
   bool isProgress = false;
 }

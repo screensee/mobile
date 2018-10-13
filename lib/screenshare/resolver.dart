@@ -13,6 +13,8 @@ class YoutubeUrlResolver extends UrlResolver {
 
   @override
   Future<String> resolve(String input) async {
+    input = input.replaceAll("youtu.be/", "www.youtube.com/watch?v=");
+
     var result = resolvedUrls[input];
     if (result != null) return result;
 

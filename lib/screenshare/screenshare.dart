@@ -4,17 +4,17 @@ import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/chat.dart';
 import 'package:screensee/screenshare/resolver.dart';
 
-const VIDEO_URL = "https://www.youtube.com/watch?v=6O8eH-J6DHY";
-
 class ScreenShare extends StatefulWidget {
+  final Room room;
+
+  const ScreenShare({Key key, this.room}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _ScreenShareState();
 }
 
 class _ScreenShareState extends State<ScreenShare> {
   final YoutubeUrlResolver urlResolver = YoutubeUrlResolver();
-
-  Room room;
 
   String url;
   dynamic error;
@@ -27,8 +27,10 @@ class _ScreenShareState extends State<ScreenShare> {
   }
 
   _loadUrl() async {
+    if (widget.room.videoLink == "") return;
+
     try {
-      url = await urlResolver.resolve(VIDEO_URL);
+      url = await urlResolver.resolve(widget.room.videoLink);
     } catch (e) {
       error = e;
     }
@@ -37,11 +39,12 @@ class _ScreenShareState extends State<ScreenShare> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.black38,
-        body: _buildBody(),
+    return Scaffold(
+      backgroundColor: Colors.black38,
+      appBar: AppBar(
+        title: Text(widget.room.id),
       ),
+      body: _buildBody(),
     );
   }
 
@@ -50,7 +53,7 @@ class _ScreenShareState extends State<ScreenShare> {
       return _buildError();
     }
 
-    if (url != null) {
+    if (widget.room.videoLink == "" || url != null) {
       return _buildScreenShare(url);
     }
     return Center(child: CircularProgressIndicator());
@@ -59,7 +62,7 @@ class _ScreenShareState extends State<ScreenShare> {
   _buildScreenShare(String data) {
     return Column(
       children: <Widget>[
-        Player(data),
+        widget.room.videoLink == "" ? SizedBox() : Player(data),
         Expanded(
           child: Chat(),
         ),

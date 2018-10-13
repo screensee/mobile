@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       title: 'Screen See',
       theme: new ThemeData(
         backgroundColor: Colors.white,
-        primarySwatch: Colors.blue,
+        primaryColor: Color(0xff3379fc),
       ),
       home: MyHomePage(),
     );
@@ -39,8 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    provider = ScreenShareUserProvider(
-      CookieStorage());
+    provider = ScreenShareUserProvider(CookieStorage());
     super.initState();
   }
 
