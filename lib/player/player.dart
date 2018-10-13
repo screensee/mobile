@@ -27,6 +27,12 @@ class _PlayerState extends State<Player> {
   }
 
   @override
+    void dispose() {
+      _controller.dispose();
+      super.dispose();
+    }
+
+  @override
   Widget build(BuildContext context) {
     return _createVideoWidget();
   }
