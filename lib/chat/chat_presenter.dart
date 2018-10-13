@@ -44,14 +44,14 @@ class ChatPresenter {
     client.logging(true);
     client.keepAlivePeriod = 30;
 
-    final mqtt.MqttConnectMessage connMess =
-        mqtt.MqttConnectMessage().keepAliveFor(30)
-        ..withClientIdentifier('Mqtt_MyClientUniqueId2')
-        .startClean()
+    final mqtt.MqttConnectMessage connMess = mqtt.MqttConnectMessage()
         .keepAliveFor(30)
-        .withWillTopic('willtopic')
-        .withWillMessage('My Will message')
-        .withWillQos(mqtt.MqttQos.atLeastOnce);
+          ..withClientIdentifier('Mqtt_MyClientUniqueId2')
+              .startClean()
+              .keepAliveFor(30)
+              .withWillTopic('willtopic')
+              .withWillMessage('My Will message')
+              .withWillQos(mqtt.MqttQos.atLeastOnce);
     print('MQTT client connecting....');
     client.connectionMessage = connMess;
 
@@ -71,19 +71,22 @@ class ChatPresenter {
   }
 
   void _onMessage(List<mqtt.MqttReceivedMessage> event) {
-    print(event.toString());
+    final mqtt.MqttPublishMessage recMess =
+        event[0].payload as mqtt.MqttPublishMessage;
+    final String message =
+        mqtt.MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+    
+    final messageJson = json.decode(message);
+    view?.addMessage(readFromJson(messageJson));
   }
 
   void sendMessage(String message) async {
     view?.showMessageProgress();
 
     try {
-      final response = await http.post("http://185.143.145.119/b/mess/post",
+      await http.post("http://185.143.145.119/b/mess/post",
           headers: {"Cookie": await cookieStorage.readCookies()},
           body: {"roomId": room.id, "text": message});
-
-      final messageJson = json.decode(response.body);
-      view?.addMessage(readFromJson(messageJson["data"]));
     } catch (e) {
       print(e);
     } finally {
