@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:screensee/player/player.dart';
+import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/chat.dart';
 import 'package:screensee/screenshare/resolver.dart';
 
@@ -12,6 +13,8 @@ class ScreenShare extends StatefulWidget {
 
 class _ScreenShareState extends State<ScreenShare> {
   final YoutubeUrlResolver urlResolver = YoutubeUrlResolver();
+
+  Room room;
 
   String url;
   dynamic error;
@@ -26,7 +29,7 @@ class _ScreenShareState extends State<ScreenShare> {
   _loadUrl() async {
     try {
       url = await urlResolver.resolve(VIDEO_URL);
-    } catch(e) {
+    } catch (e) {
       error = e;
     }
     setState(() {});
@@ -36,12 +39,24 @@ class _ScreenShareState extends State<ScreenShare> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          backgroundColor: Colors.black38,
-          body: url == null ? SizedBox() : _buildScreen(url)),
+        backgroundColor: Colors.black38,
+        body: _buildBody(),
+      ),
     );
   }
 
-  _buildScreen(String data) {
+  Widget _buildBody() {
+    if (error != null) {
+      return _buildError();
+    }
+
+    if (url != null) {
+      return _buildScreenShare(url);
+    }
+    return Center(child: CircularProgressIndicator());
+  }
+
+  _buildScreenShare(String data) {
     return Column(
       children: <Widget>[
         Player(data),
