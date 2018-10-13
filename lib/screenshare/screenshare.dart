@@ -3,6 +3,7 @@ import 'package:screensee/player/player.dart';
 import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/chat.dart';
 import 'package:screensee/screenshare/resolver.dart';
+import 'package:screensee/screenshare/screenshare_presenter.dart';
 
 class ScreenShare extends StatefulWidget {
   final Room room;
@@ -13,28 +14,24 @@ class ScreenShare extends StatefulWidget {
   State<StatefulWidget> createState() => _ScreenShareState();
 }
 
-class _ScreenShareState extends State<ScreenShare> {
+class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   final YoutubeUrlResolver urlResolver = YoutubeUrlResolver();
 
-  String url;
-  dynamic error;
+  ScreensharePresenter presenter;
+  WidgetBuilder currentBuilder;
 
   @override
   void initState() {
-    _loadUrl();
+    presenter = ScreensharePresenter(urlResolver);
+    currentBuilder = (context) {
+      return Center(child: CircularProgressIndicator());
+    };
+
+    presenter.view = this;
+
+    presenter.initRoom(widget.room);
 
     super.initState();
-  }
-
-  _loadUrl() async {
-    if (widget.room.videoLink == "") return;
-
-    try {
-      url = await urlResolver.resolve(widget.room.videoLink);
-    } catch (e) {
-      error = e;
-    }
-    setState(() {});
   }
 
   @override
@@ -44,33 +41,52 @@ class _ScreenShareState extends State<ScreenShare> {
       appBar: AppBar(
         title: Text(widget.room.pseudonym),
       ),
-      body: _buildBody(),
+      body: currentBuilder(context),
     );
   }
 
-  Widget _buildBody() {
-    if (error != null) {
-      return _buildError();
-    }
-
-    if (widget.room.videoLink == "" || url != null) {
-      return _buildScreenShare(url);
-    }
-    return Center(child: CircularProgressIndicator());
+  @override
+  void showError() {
+    setState(() {
+      currentBuilder = (context) {
+        return Text("error");
+      };
+    });
   }
 
-  _buildScreenShare(String data) {
-    return Column(
-      children: <Widget>[
-        widget.room.videoLink == "" ? SizedBox() : Player(data),
-        Expanded(
-          child: Chat(),
-        ),
-      ],
-    );
+  @override
+  void showPlayer(String url) {
+    setState(() {
+      currentBuilder = (context) {
+        return Column(
+          children: <Widget>[
+            Player(url),
+            Expanded(
+              child: Chat(),
+            ),
+          ],
+        );
+      };
+    });
   }
 
-  _buildError() {
-    return Text("error");
+  @override
+  void showWithoutPlayer() {
+    setState(() {
+      currentBuilder = (context) {
+        return Chat();
+      };
+    });
+  }
+
+  @override
+  void showProgress() {
+    setState(() {
+      currentBuilder = (context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      };
+    });
   }
 }

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:screensee/screenshare/message.dart';
 
 class Chat extends StatefulWidget {
+
+  Chat({Key key}): super(key: key);
+
   @override
   State<StatefulWidget> createState() => _ChatState();
 }
