@@ -22,28 +22,23 @@ class ScreensharePresenter {
     try {
       await _resolveUrl();
     } catch (e) {
-      view?.showError();
+      view?.showWithoutPlayer();
     }
   }
 
   void updateLink(String link) async {
-    final result = await http.post("http://185.143.145.119/b/rooms/update",
-        headers: {"Cookie": await cookieStorage.readCookies()},
-        body: {"roomId": room.id, "videoLink": link});
+    try {
+      final url = await resolver.resolve(link);
+      final result = await http.post("http://185.143.145.119/b/rooms/update",
+          headers: {"Cookie": await cookieStorage.readCookies()},
+          body: {"roomId": room.id, "videoLink": link});
 
-    final resultJson = json.decode(result.body);
-    room = parseFromJson(resultJson);
+      final resultJson = json.decode(result.body);
+      room = parseFromJson(resultJson);
 
-    await _resolveUrl();
-  }
-
-  _resolveUrl() async {
-    view?.showPlayerProgress();
-    if (hasLink) {
-      final url = await resolver.resolve(room.videoLink);
       view?.showPlayer(url);
-    } else {
-      view?.showWithoutPlayer();
+    } catch (e) {
+      view?.showUrlUpdateError();
     }
   }
 
@@ -62,12 +57,23 @@ class ScreensharePresenter {
     }
   }
 
+  _resolveUrl() async {
+    view?.showPlayerProgress();
+    if (hasLink) {
+      final url = await resolver.resolve(room.videoLink);
+      view?.showPlayer(url);
+    } else {
+      view?.showWithoutPlayer();
+    }
+  }
+
   bool get hasLink => room?.videoLink?.isNotEmpty ?? false;
 }
 
 abstract class ScreenShareView {
   void showProgress();
-  void showError();
+
+  void showUrlUpdateError();
 
   void showPlayerProgress();
   void showWithoutPlayer();

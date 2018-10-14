@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 class ApiException implements Exception {}
 
+class ResolverException implements Exception {}
+
 class ErrorView extends StatelessWidget {
 
   final VoidCallback onRetry;

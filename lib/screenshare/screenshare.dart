@@ -21,7 +21,7 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   final CookieStorage cookieStorage = Injector.instance.cookieStorage;
 
   ScreensharePresenter presenter;
-  WidgetBuilder currentBuilder;
+  ScreenShareState state;
 
   TextEditingController youtubeLinkController;
 
@@ -29,10 +29,6 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   void initState() {
     presenter = ScreensharePresenter(urlResolver, cookieStorage);
     youtubeLinkController = TextEditingController();
-
-    currentBuilder = (context) {
-      return Center(child: CircularProgressIndicator());
-    };
 
     presenter.view = this;
 
@@ -48,115 +44,158 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
       appBar: AppBar(
         title: Text(widget.room.pseudonym),
       ),
-      body: currentBuilder(context),
+      body: _buildBody(),
     );
   }
 
-  @override
-  void showError() {
-    setState(() {
-      currentBuilder = (context) {
-        return Text("error");
-      };
-    });
+  _buildBody() {
+    if (state is LoadingState) {
+      return _buildProgress();
+    }
+    if (state is DataState) {
+      return _buildPlayer((state as DataState).url);
+    }
+    if (state is NoPlayerState) {
+      return _buildNoPlayer((state as NoPlayerState).error);
+    }
+    if (state is PlayerLoadingState) {
+      return _buildPlayerProgress();
+    }
+
+    return Text("error");
+  }
+
+  _buildProgress() {
+    return Center(child: CircularProgressIndicator());
+  }
+
+  _buildPlayer(String url) {
+    return Column(
+      children: <Widget>[
+        Player(url),
+        Expanded(
+          child: Chat(room: widget.room),
+        ),
+      ],
+    );
+  }
+
+  _buildNoPlayer(String error) {
+    return Column(
+      children: <Widget>[
+        AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Container(
+            color: Color(0xff333333),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: TextField(
+                      controller: youtubeLinkController,
+                      decoration: InputDecoration(
+                          border: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white)),
+                          hintText: "Set a valid YouTube url",
+                          hintStyle: TextStyle(color: Colors.white54),
+                          errorText: error),
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.check),
+                    color: Colors.white,
+                    onPressed: () {
+                      presenter.updateLink(youtubeLinkController.value.text);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.refresh),
+                    color: Colors.white,
+                    onPressed: () {
+                      presenter.refresh();
+                    },
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(child: Chat(room: widget.room)),
+      ],
+    );
+  }
+
+  _buildPlayerProgress() {
+    return Column(
+      children: <Widget>[
+        AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Container(
+            color: Color(0xff333333),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        ),
+        Expanded(child: Chat(room: widget.room)),
+      ],
+    );
   }
 
   @override
   void showPlayer(String url) {
     setState(() {
-      currentBuilder = (context) {
-        return Column(
-          children: <Widget>[
-            Player(url),
-            Expanded(
-              child: Chat(room: widget.room),
-            ),
-          ],
-        );
-      };
+      state = DataState(url);
     });
   }
 
   @override
   void showWithoutPlayer() {
     setState(() {
-      currentBuilder = (context) {
-        return Column(
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Container(
-                color: Color(0xff333333),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
-                          controller: youtubeLinkController,
-                          decoration: InputDecoration(
-                              border: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white)),
-                              hintText: "Set a valid YouTube url",
-                              hintStyle: TextStyle(color: Colors.white54)),
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.check),
-                        color: Colors.white,
-                        onPressed: () {
-                          presenter
-                              .updateLink(youtubeLinkController.value.text);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.refresh),
-                        color: Colors.white,
-                        onPressed: () {
-                          presenter.refresh();
-                        },
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(child: Chat(room: widget.room)),
-          ],
-        );
-      };
+      state = NoPlayerState();
     });
   }
 
   @override
   void showProgress() {
     setState(() {
-      currentBuilder = (context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      };
+      state = LoadingState();
     });
   }
 
   @override
   void showPlayerProgress() {
-    currentBuilder = (context) {
-      return Column(
-        children: <Widget>[
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Container(
-              color: Color(0xff333333),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          ),
-          Expanded(child: Chat(room: widget.room)),
-        ],
-      );
-    };
+    setState(() {
+      state = PlayerLoadingState();
+    });
   }
+
+  @override
+  void showUrlUpdateError() {
+    setState(() {
+      state = NoPlayerState(error: "Invalid url");
+    });
+  }
+}
+
+abstract class ScreenShareState {}
+
+class LoadingState implements ScreenShareState {
+  const LoadingState();
+}
+
+class DataState implements ScreenShareState {
+  final String url;
+  const DataState(this.url);
+}
+
+class PlayerLoadingState implements ScreenShareState {
+  const PlayerLoadingState();
+}
+
+class NoPlayerState implements ScreenShareState {
+  final String error;
+  const NoPlayerState({this.error});
 }
