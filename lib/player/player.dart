@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:screensee/inject/inject.dart';
 import 'package:screensee/player/player_presenter.dart';
 import 'package:screensee/room.dart';
@@ -20,6 +22,8 @@ class _PlayerState extends State<Player> implements PlayerView {
   PlayerState playerState = PlayerState.PAUSE;
   VideoPlayerController _controller;
 
+  Timer timer;
+
   @override
   void initState() {
     presenter = PlayerPresenter(Injector.instance.mqttManager);
@@ -33,14 +37,23 @@ class _PlayerState extends State<Player> implements PlayerView {
           playerState = PlayerState.PLAYING;
           presenter.play();
         });
+
+        timer = updatePosition();
       });
 
     super.initState();
   }
 
+  updatePosition() {
+    const oneSec = const Duration(seconds: 1);
+    return Timer.periodic(oneSec, (Timer t) => presenter.updateTime(_controller.value.position.inSeconds));
+  }
+
   @override
   void dispose() {
     _controller.dispose();
+
+    timer.cancel();
     super.dispose();
   }
 
@@ -89,8 +102,8 @@ class _PlayerState extends State<Player> implements PlayerView {
   }
 
   @override
-  void seekTo(int millis) {
-    _controller.seekTo(Duration(milliseconds: millis));
+  void seekTo(int seconds) {
+    _controller.seekTo(Duration(seconds: seconds));
   }
 
   @override

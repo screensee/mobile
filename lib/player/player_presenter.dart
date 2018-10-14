@@ -2,9 +2,11 @@ import 'package:screensee/mqtt_manager.dart';
 import 'package:screensee/room.dart';
 
 class PlayerPresenter {
-
   final MqttManager mqttManager;
   PlayerView view;
+
+  Room room;
+  int currentTimeSeconds = 0;
 
   String currentTimeTopic;
   String seekTopic;
@@ -14,6 +16,8 @@ class PlayerPresenter {
   PlayerPresenter(this.mqttManager);
 
   void init(Room room) {
+    this.room = room;
+
     currentTimeTopic = "room/${room.id}/currentTime";
     seekTopic = "room/${room.id}/seek";
     playTopic = "room/${room.id}/play";
@@ -21,10 +25,14 @@ class PlayerPresenter {
 
     mqttManager.stream.listen((payload) {
       if (payload.topic == currentTimeTopic) {
-        view?.seekTo(0);
+        final newTime = int.parse(payload.message);
+        if (!room.isMaster && (currentTimeSeconds - newTime).abs() >= 5) {
+          currentTimeSeconds = newTime;
+          view?.seekTo(newTime);
+        }
       }
       if (payload.topic == seekTopic) {
-        view?.seekTo(0);
+        view?.seekTo(int.parse(payload.message));
       }
       if (payload.topic == playTopic) {
         view?.showPlay();
@@ -43,18 +51,20 @@ class PlayerPresenter {
     mqttManager.publish(pauseTopic, message: "pause");
   }
 
-  void seekTo(int millis) {
-    mqttManager.publish(seekTopic, message: millis.toString());
+  void seekTo(int seconds) {
+    mqttManager.publish(seekTopic, message: seconds.toString());
   }
 
-  void updateTime(int newTimeMillis) {
-    mqttManager.publish(currentTimeTopic, message: newTimeMillis.toString());
+  void updateTime(int seconds) {
+    currentTimeSeconds = seconds;
+    if (room.isMaster) {
+      mqttManager.publish(currentTimeTopic, message: seconds.toString());
+    }
   }
 }
 
 abstract class PlayerView {
-
   void showPlay();
   void showPause();
-  void seekTo(int millis);
+  void seekTo(int seconds);
 }
