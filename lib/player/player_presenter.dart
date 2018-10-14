@@ -26,7 +26,7 @@ class PlayerPresenter {
     mqttManager.stream.listen((payload) {
       if (payload.topic == currentTimeTopic) {
         final newTime = int.parse(payload.message);
-        if (!room.isMaster && (currentTimeSeconds - newTime).abs() >= 5) {
+        if (!room.isMaster && (currentTimeSeconds - newTime).abs() >= 3) {
           currentTimeSeconds = newTime;
           view?.seekTo(newTime);
         }
