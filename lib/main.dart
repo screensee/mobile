@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:screensee/create/create.dart';
+import 'package:screensee/errors.dart';
 import 'package:screensee/inject/inject.dart';
 import 'package:screensee/join/join.dart';
 import 'package:screensee/user.dart';
@@ -34,28 +35,34 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  UserProvider provider;
+class _MyHomePageState extends State<MyHomePage> implements HomeView {
+  HomePresenter presenter;
+  HomeState state = HomeState.LOADING;
 
   @override
   void initState() {
-    provider = Injector.instance.userProvider;
+    presenter = HomePresenter(Injector.instance.userProvider);
+    presenter.view = this;
+
+    presenter.init();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: provider.getUser(),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.done:
-            return _buildActions();
-          default:
-            return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+    switch (state) {
+      case HomeState.DONE:
+        return _buildActions();
+      case HomeState.LOADING:
+        return _buildLoading();
+      default:
+        return _buildError();
+    }
+  }
+
+  _buildLoading() {
+    return Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 
   _buildActions() {
@@ -70,4 +77,67 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+
+  _buildError() {
+    return Scaffold(body: Center(child: ErrorView(
+      onRetry: () {
+        presenter.retry();
+      },
+    )));
+  }
+
+  @override
+  void showActions() {
+    setState(() {
+      state = HomeState.DONE;
+    });
+  }
+
+  @override
+  void showError() {
+    setState(() {
+      state = HomeState.ERROR;
+    });
+  }
+
+  @override
+  void showLoading() {
+    setState(() {
+      state = HomeState.LOADING;
+    });
+  }
+}
+
+enum HomeState { LOADING, DONE, ERROR }
+
+class HomePresenter {
+  final UserProvider userProvider;
+
+  HomeView view;
+
+  HomePresenter(this.userProvider);
+
+  init() {
+    _loadData();
+  }
+
+  retry() {
+    _loadData();
+  }
+
+  _loadData() async {
+    view?.showLoading();
+    try {
+      await userProvider.getUser();
+      view?.showActions();
+    } catch (e) {
+      view?.showError();
+    }
+  }
+}
+
+abstract class HomeView {
+  void showLoading();
+  void showActions();
+  void showError();
 }
