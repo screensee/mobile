@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
+import 'package:screensee/user.dart';
 
 class MqttManager {
+  final UserProvider userProvider;
+
   mqtt.MqttClient _client;
   StreamController<SocketPayload> _eventStream;
   Stream get stream => _eventStream.stream;
 
-  MqttManager() {
+  MqttManager(this.userProvider) {
     _eventStream = StreamController.broadcast();
   }
 
@@ -16,9 +19,11 @@ class MqttManager {
     _client.logging(true);
     _client.keepAlivePeriod = 30;
 
+    final user = await userProvider.getUser();
+
     final mqtt.MqttConnectMessage connMess = mqtt.MqttConnectMessage()
         .keepAliveFor(30)
-          ..withClientIdentifier('Mqtt_MyClientUniqueId2')
+          ..withClientIdentifier(user.name)
               .startClean()
               .keepAliveFor(30)
               .withWillTopic('willtopic')
@@ -52,7 +57,7 @@ class MqttManager {
     if (message != null) {
       builder.addString(message);
     }
-    _client.publishMessage(topic, mqtt.MqttQos.exactlyOnce, builder.payload);
+    _client.publishMessage(topic, mqtt.MqttQos.atLeastOnce, builder.payload);
   }
 
   void dispose() {

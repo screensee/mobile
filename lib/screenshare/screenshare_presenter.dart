@@ -23,6 +23,7 @@ class ScreensharePresenter {
 
     try {
       await mqttManager.connect();
+      mqttManager.subscribeToTopic("room/${room.id}/#");
       await _resolveUrl();
     } catch (e) {
       view?.showWithoutPlayer();
@@ -39,7 +40,7 @@ class ScreensharePresenter {
       final resultJson = json.decode(result.body);
       room = parseFromJson(resultJson);
 
-      view?.showPlayer(url);
+      view?.showPlayer(room, url);
     } catch (e) {
       view?.showUrlUpdateError();
     }
@@ -64,7 +65,7 @@ class ScreensharePresenter {
     view?.showPlayerProgress();
     if (hasLink) {
       final url = await resolver.resolve(room.videoLink);
-      view?.showPlayer(url);
+      view?.showPlayer(room, url);
     } else {
       view?.showWithoutPlayer();
     }
@@ -84,5 +85,5 @@ abstract class ScreenShareView {
 
   void showPlayerProgress();
   void showWithoutPlayer();
-  void showPlayer(String url);
+  void showPlayer(Room room, String url);
 }

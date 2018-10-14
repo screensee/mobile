@@ -42,8 +42,6 @@ class ChatPresenter {
 
   _listenMqtt() {
     try {
-      mqttManager.subscribeToTopic(streamTopic);
-
       mqttManager.stream.listen((payload) {
         if (payload.topic == streamTopic) {
           final messageJson = json.decode(payload.message);

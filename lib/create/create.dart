@@ -52,10 +52,10 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
           SizedBox(height: 24.0),
           TextField(
             onChanged: (value) {
-              model.password = value;
+              model.pseudonym = value;
             },
             decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Password (optional)"),
+                border: OutlineInputBorder(), labelText: "Room name (optional)"),
           ),
           SizedBox(height: 8.0),
           model.state == CreateState.ERROR
@@ -79,7 +79,7 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
                 onPressed: model.state != CreateState.LOADING
                     ? () {
                         presenter.createRoom(
-                            link: model.link, password: model.password);
+                            link: model.link, pseudonym: model.pseudonym);
                       }
                     : null,
               ),
@@ -127,7 +127,7 @@ enum CreateState { CONTENT, LOADING, ERROR }
 
 class ViewModel {
   String link;
-  String password;
+  String pseudonym;
 
   CreateState state = CreateState.CONTENT;
 }

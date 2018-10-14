@@ -15,8 +15,8 @@ class JoinPresenter {
   void joinRoom(String roomName) async {
     view?.showProgress();
     try {
-      final response = await http.get(
-          "http://185.143.145.119/b/rooms/$roomName",
+      final response = await http.post(
+          "http://185.143.145.119/b/rooms/join/$roomName",
           headers: {"Cookie": await cookieStorage.readCookies()});
 
       final resultJson = json.decode(response.body);

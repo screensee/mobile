@@ -12,7 +12,7 @@ class CreatePresenter {
 
   CreatePresenter(this.cookieStorage);
 
-  void createRoom({String link, String password}) async {
+  void createRoom({String link, String pseudonym}) async {
     view?.showProgress();
     try {
       final cookie = await cookieStorage.readCookies();
@@ -20,8 +20,8 @@ class CreatePresenter {
       if (link != null) {
         body["videoLink"] = link;
       }
-      if (password != null) {
-        body["password"] = password;
+      if (pseudonym != null) {
+        body["pseudonym"] = pseudonym;
       }
 
       final response = await http.post("http://185.143.145.119/b/rooms/create",

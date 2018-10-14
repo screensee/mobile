@@ -1,12 +1,14 @@
 import 'package:screensee/inject/inject.dart';
 import 'package:screensee/player/player_presenter.dart';
+import 'package:screensee/room.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
 class Player extends StatefulWidget {
-  final String videoUrl;
+  final Room room;
+  final String url;
 
-  const Player(this.videoUrl, {Key key}) : super(key: key);
+  const Player(this.room, this.url, {Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PlayerState();
@@ -20,7 +22,11 @@ class _PlayerState extends State<Player> implements PlayerView {
 
   @override
   void initState() {
-    _controller = VideoPlayerController.network(widget.videoUrl)
+    presenter = PlayerPresenter(Injector.instance.mqttManager);
+    presenter.init(widget.room);
+    presenter.view = this;
+
+    _controller = VideoPlayerController.network(widget.url)
       ..addListener(() {})
       ..initialize().then((_) {
         setState(() {
@@ -28,9 +34,6 @@ class _PlayerState extends State<Player> implements PlayerView {
           presenter.play();
         });
       });
-
-    presenter = PlayerPresenter(Injector.instance.mqttManager);
-    presenter.view = this;
 
     super.initState();
   }

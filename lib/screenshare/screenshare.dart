@@ -61,7 +61,8 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
       return _buildProgress();
     }
     if (state is DataState) {
-      return _buildPlayer((state as DataState).url);
+      final dataState = state as DataState;
+      return _buildPlayer(dataState.room, dataState.url);
     }
     if (state is NoPlayerState) {
       return _buildNoPlayer((state as NoPlayerState).error);
@@ -77,10 +78,10 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
     return Center(child: CircularProgressIndicator());
   }
 
-  _buildPlayer(String url) {
+  _buildPlayer(Room room, String url) {
     return Column(
       children: <Widget>[
-        Player(url),
+        Player(room, url),
         Expanded(
           child: Chat(room: widget.room),
         ),
@@ -153,9 +154,9 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   }
 
   @override
-  void showPlayer(String url) {
+  void showPlayer(Room room, String url) {
     setState(() {
-      state = DataState(url);
+      state = DataState(room, url);
     });
   }
 
@@ -195,8 +196,9 @@ class LoadingState implements ScreenShareState {
 }
 
 class DataState implements ScreenShareState {
+  final Room room;
   final String url;
-  const DataState(this.url);
+  const DataState(this.room, this.url);
 }
 
 class PlayerLoadingState implements ScreenShareState {

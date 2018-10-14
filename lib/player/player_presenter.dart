@@ -19,39 +19,31 @@ class PlayerPresenter {
     playTopic = "room/${room.id}/play";
     pauseTopic = "room/${room.id}/pause";
 
-    mqttManager.subscribeToTopic(currentTimeTopic);
-    mqttManager.subscribeToTopic(seekTopic);
-    mqttManager.subscribeToTopic(playTopic);
-    mqttManager.subscribeToTopic(pauseTopic);
-
     mqttManager.stream.listen((payload) {
-      if (payload.topic == "room/${room.id}/currentTime") {
+      if (payload.topic == currentTimeTopic) {
         view?.seekTo(0);
       }
-      if (payload.topic == "room/${room.id}/seek") {
+      if (payload.topic == seekTopic) {
         view?.seekTo(0);
       }
-      if (payload.topic == "room/${room.id}/play") {
+      if (payload.topic == playTopic) {
         view?.showPlay();
       }
-      if (payload.topic == "room/${room.id}/pause") {
+      if (payload.topic == pauseTopic) {
         view?.showPause();
       }
     });
   }
 
   void play() {
-    view?.showPlay();
-    mqttManager.publish(playTopic);
+    mqttManager.publish(playTopic, message: "play");
   }
 
   void pause() {
-    view?.showPause();
-    mqttManager.publish(pauseTopic);
+    mqttManager.publish(pauseTopic, message: "pause");
   }
 
   void seekTo(int millis) {
-    view?.seekTo(millis);
     mqttManager.publish(seekTopic, message: millis.toString());
   }
 

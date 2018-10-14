@@ -21,5 +21,5 @@ class Injector {
   UrlResolver get urlResolver => _urlResolver ??= YoutubeUrlResolver();
 
   MqttManager _mqttManager;
-  MqttManager get mqttManager => _mqttManager ??= MqttManager();
+  MqttManager get mqttManager => _mqttManager ??= MqttManager(userProvider);
 }
