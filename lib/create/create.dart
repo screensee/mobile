@@ -40,6 +40,7 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
       constraints: BoxConstraints(maxWidth: 300.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextField(
             onChanged: (value) {
@@ -56,32 +57,41 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Password (optional)"),
           ),
-          SizedBox(height: 24.0),
-          RaisedButton(
-            child: Container(
-                width: 300.0,
-                child: Stack(
-                  children: <Widget>[
-                    Center(child: Text("CREATE")),
-                    model.isProgress
-                        ? Positioned(
-                            right: 15.0,
-                            child: SizedBox(
-                                width: 15.0,
-                                height: 15.0,
-                                child: CircularProgressIndicator()),
-                          )
-                        : SizedBox()
-                  ],
-                )),
-            onPressed: !model.isProgress
-                ? () {
-                    model.isProgress = false;
-                    model.isError = false;
-                    presenter.createRoom(
-                        link: model.link, password: model.password);
-                  }
-                : null,
+          SizedBox(height: 8.0),
+          model.state == CreateState.ERROR
+              ? Text(
+                  "Something went wrong",
+                  style: TextStyle(color: Colors.red),
+                )
+              : SizedBox(),
+          SizedBox(height: 8.0),
+          Stack(
+            alignment: Alignment.centerRight,
+            children: <Widget>[
+              RaisedButton(
+                child: Container(
+                    width: 300.0,
+                    child: Stack(
+                      children: <Widget>[
+                        Center(child: Text("CREATE")),
+                      ],
+                    )),
+                onPressed: model.state != CreateState.LOADING
+                    ? () {
+                        presenter.createRoom(
+                            link: model.link, password: model.password);
+                      }
+                    : null,
+              ),
+              model.state == CreateState.LOADING
+                  ? Positioned(
+                      right: 15.0,
+                      child: SizedBox(
+                          width: 15.0,
+                          height: 15.0,
+                          child: CircularProgressIndicator()))
+                  : SizedBox(),
+            ],
           ),
         ],
       ),
@@ -91,8 +101,7 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
   @override
   void openRoom(Room room) {
     setState(() {
-      model.isProgress = false;
-      model.isError = false;
+      model.state = CreateState.CONTENT;
     });
 
     Navigator.of(context).pushReplacement(
@@ -102,24 +111,23 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
   @override
   void showError() {
     setState(() {
-      model.isError = true;
-      model.isProgress = false;
+      model.state = CreateState.ERROR;
     });
   }
 
   @override
   void showProgress() {
     setState(() {
-      model.isError = false;
-      model.isProgress = true;
+      model.state = CreateState.LOADING;
     });
   }
 }
+
+enum CreateState { CONTENT, LOADING, ERROR }
 
 class ViewModel {
   String link;
   String password;
 
-  bool isError = false;
-  bool isProgress = false;
+  CreateState state = CreateState.CONTENT;
 }
