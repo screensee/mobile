@@ -1,6 +1,7 @@
 // one global service locator for all
 
 import 'package:screensee/cookie.dart';
+import 'package:screensee/mqtt_manager.dart';
 import 'package:screensee/screenshare/resolver.dart';
 import 'package:screensee/user.dart';
 
@@ -18,4 +19,7 @@ class Injector {
 
   UrlResolver _urlResolver;
   UrlResolver get urlResolver => _urlResolver ??= YoutubeUrlResolver();
+
+  MqttManager _mqttManager;
+  MqttManager get mqttManager => _mqttManager ??= MqttManager();
 }

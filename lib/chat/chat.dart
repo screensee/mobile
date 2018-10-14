@@ -26,7 +26,7 @@ class _ChatState extends State<Chat> implements ChatView {
   @override
   void initState() {
     presenter = ChatPresenter(
-        Injector.instance.cookieStorage, Injector.instance.userProvider);
+        Injector.instance.cookieStorage, Injector.instance.userProvider, Injector.instance.mqttManager);
     scrollController = ScrollController();
 
     viewModel = ViewModel();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:screensee/chat/chat.dart';
 import 'package:screensee/cookie.dart';
 import 'package:screensee/inject/inject.dart';
+import 'package:screensee/mqtt_manager.dart';
 import 'package:screensee/player/player.dart';
 import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/resolver.dart';
@@ -19,6 +20,7 @@ class ScreenShare extends StatefulWidget {
 class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
   final UrlResolver urlResolver = Injector.instance.urlResolver;
   final CookieStorage cookieStorage = Injector.instance.cookieStorage;
+  final MqttManager mqttManager = Injector.instance.mqttManager;
 
   ScreensharePresenter presenter;
   ScreenShareState state;
@@ -27,7 +29,7 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
 
   @override
   void initState() {
-    presenter = ScreensharePresenter(urlResolver, cookieStorage);
+    presenter = ScreensharePresenter(urlResolver, cookieStorage, mqttManager);
     youtubeLinkController = TextEditingController();
 
     presenter.view = this;
@@ -36,6 +38,12 @@ class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
 
     super.initState();
   }
+
+  @override
+    void dispose() {
+      presenter.dispose();
+      super.dispose();
+    }
 
   @override
   Widget build(BuildContext context) {
