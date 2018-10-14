@@ -37,6 +37,14 @@ class _JoinPageState extends State<JoinPage> implements JoinView {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  Center(
+                    child: Text(
+                      "Join Room",
+                      style: TextStyle(
+                          fontSize: 24.0),
+                    ),
+                  ),
+                  SizedBox(height: 24.0),
                   TextField(
                     decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -53,7 +61,10 @@ class _JoinPageState extends State<JoinPage> implements JoinView {
                   Stack(
                     alignment: Alignment.centerRight,
                     children: <Widget>[
-                      RaisedButton(
+                      OutlineButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.0)),
+                        borderSide: BorderSide(color: Colors.black),
                         child: Container(
                             width: 300.0, child: Center(child: Text("JOIN"))),
                         onPressed: model.roomId.isNotEmpty &&

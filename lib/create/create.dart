@@ -42,6 +42,13 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Center(
+            child: Text(
+              "Create Room",
+              style: TextStyle(fontSize: 24.0),
+            ),
+          ),
+          SizedBox(height: 24.0),
           TextField(
             onChanged: (value) {
               model.link = value;
@@ -55,7 +62,8 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
               model.pseudonym = value;
             },
             decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Room name (optional)"),
+                border: OutlineInputBorder(),
+                labelText: "Room name (optional)"),
           ),
           SizedBox(height: 8.0),
           model.state == CreateState.ERROR
@@ -68,7 +76,10 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
           Stack(
             alignment: Alignment.centerRight,
             children: <Widget>[
-              RaisedButton(
+              OutlineButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0)),
+                borderSide: BorderSide(color: Colors.black),
                 child: Container(
                     width: 300.0,
                     child: Stack(
