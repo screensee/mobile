@@ -10,11 +10,11 @@ class MqttManager {
   StreamController<SocketPayload> _eventStream;
   Stream get stream => _eventStream.stream;
 
-  MqttManager(this.userProvider) {
-    _eventStream = StreamController.broadcast();
-  }
+  MqttManager(this.userProvider);
 
   Future connect() async {
+    _eventStream = StreamController.broadcast();
+
     _client = mqtt.MqttClient("185.143.145.119", '');
     _client.logging(true);
     _client.keepAlivePeriod = 30;
