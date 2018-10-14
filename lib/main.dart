@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       title: 'Screen See',
       theme: new ThemeData(
         backgroundColor: Colors.white,
-        primaryColor: Color(0xff3379fc),
+        primaryColor: Color(0xff0000ff),
       ),
       home: MyHomePage(),
     );

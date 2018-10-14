@@ -24,7 +24,7 @@ class ActionsPage extends StatelessWidget {
                 Text("See",
                     style: TextStyle(
                         fontSize: 32.0,
-                        color: Color(0xff3379fc),
+                        color: Color(0xff0000ff),
                         fontWeight: FontWeight.bold)),
               ],
             ),
