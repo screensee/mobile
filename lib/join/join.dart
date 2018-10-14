@@ -11,6 +11,7 @@ class JoinPage extends StatefulWidget {
 
 class _JoinPageState extends State<JoinPage> implements JoinView {
   JoinPresenter presenter;
+
   ViewModel model;
 
   @override
@@ -19,7 +20,7 @@ class _JoinPageState extends State<JoinPage> implements JoinView {
     model = ViewModel();
 
     presenter.view = this;
-    
+
     super.initState();
   }
 
@@ -34,24 +35,43 @@ class _JoinPageState extends State<JoinPage> implements JoinView {
             child: Form(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   TextField(
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(), labelText: "Room Name"),
+                        border: OutlineInputBorder(),
+                        labelText: "Room Name",
+                        errorText: model.state == JoinState.ERROR
+                            ? "Something went wrong"
+                            : null),
                     onChanged: (value) {
                       setState(() {
                         model.roomId = value;
                       });
                     },
                   ),
-                  RaisedButton(
-                    child: Container(
-                        width: 300.0, child: Center(child: Text("JOIN"))),
-                    onPressed: model.roomId.isNotEmpty
-                        ? () {
-                            presenter.joinRoom(model.roomId);
-                          }
-                        : null,
+                  Stack(
+                    alignment: Alignment.centerRight,
+                    children: <Widget>[
+                      RaisedButton(
+                        child: Container(
+                            width: 300.0, child: Center(child: Text("JOIN"))),
+                        onPressed: model.roomId.isNotEmpty &&
+                                model.state != JoinState.LOADING
+                            ? () {
+                                presenter.joinRoom(model.roomId);
+                              }
+                            : null,
+                      ),
+                      model.state == JoinState.LOADING
+                          ? Positioned(
+                              right: 15.0,
+                              child: SizedBox(
+                                  width: 15.0,
+                                  height: 15.0,
+                                  child: CircularProgressIndicator()))
+                          : SizedBox()
+                    ],
                   ),
                 ],
               ),
@@ -69,12 +89,24 @@ class _JoinPageState extends State<JoinPage> implements JoinView {
   }
 
   @override
-  void showError() {}
+  void showError() {
+    setState(() {
+      model.state = JoinState.ERROR;
+    });
+  }
 
   @override
-  void showProgress() {}
+  void showProgress() {
+    setState(() {
+      model.state = JoinState.LOADING;
+    });
+  }
 }
+
+enum JoinState { LOADING, ERROR, CONTENT }
 
 class ViewModel {
   String roomId = "";
+
+  JoinState state = JoinState.CONTENT;
 }
