@@ -73,31 +73,33 @@ class _PlayerState extends State<Player> implements PlayerView {
         );
 
   _buildVideoWidget() {
-    return Stack(
-      alignment: Alignment.center,
-      children: <Widget>[
-        AspectRatio(
-          aspectRatio: _controller.value.aspectRatio,
-          child: VideoPlayer(_controller),
-        ),
-        playerState == PlayerState.PAUSE
-            ? IconButton(
-                icon: Icon(Icons.play_arrow),
-                iconSize: 48.0,
-                color: Colors.white,
-                onPressed: () {
-                  presenter.play();
-                },
-              )
-            : IconButton(
-                icon: Icon(Icons.pause),
-                iconSize: 48.0,
-                color: Colors.white,
-                onPressed: () {
-                  presenter.pause();
-                },
-              )
-      ],
+    return Container(
+      color: Color(0xff333333),
+      child: Column(
+        children: <Widget>[
+          AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          ),
+          playerState == PlayerState.PAUSE
+              ? IconButton(
+                  icon: Icon(Icons.play_arrow),
+                  iconSize: 36.0,
+                  color: Colors.white,
+                  onPressed: () {
+                    presenter.play();
+                  },
+                )
+              : IconButton(
+                  icon: Icon(Icons.pause),
+                  iconSize: 36.0,
+                  color: Colors.white,
+                  onPressed: () {
+                    presenter.pause();
+                  },
+                )
+        ],
+      ),
     );
   }
 
