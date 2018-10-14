@@ -71,8 +71,15 @@ class ScreensharePresenter {
     }
   }
 
-  void dispose() {
+  void dispose() async {
     mqttManager.dispose();
+
+    try {
+      http.post("http://185.143.145.119/b/exit/room/${room.id}",
+          headers: {"Cookie": await cookieStorage.readCookies()});
+    } catch (e) {
+      print(e);
+    }
   }
 
   bool get hasLink => room?.videoLink?.isNotEmpty ?? false;
