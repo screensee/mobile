@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:screensee/cookie.dart';
 import 'package:screensee/create/create_presenter.dart';
+import 'package:screensee/inject/inject.dart';
 import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/screenshare.dart';
 
@@ -16,7 +16,7 @@ class _CreatePageState extends State<CreatePage> implements CreateView {
   @override
   void initState() {
     model = ViewModel();
-    presenter = CreatePresenter(CookieStorage());
+    presenter = CreatePresenter(Injector.instance.cookieStorage);
 
     presenter.view = this;
 

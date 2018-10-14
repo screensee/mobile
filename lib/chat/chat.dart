@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:screensee/chat/chat_presenter.dart';
 import 'package:screensee/chat/message.dart';
-import 'package:screensee/cookie.dart';
+import 'package:screensee/inject/inject.dart';
 import 'package:screensee/room.dart';
+import 'package:screensee/user.dart';
 
 class Chat extends StatefulWidget {
   final Room room;
@@ -14,8 +15,6 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> implements ChatView {
-  final CookieStorage storage = CookieStorage();
-
   ChatPresenter presenter;
 
   List<Message> messages = List();
@@ -26,7 +25,8 @@ class _ChatState extends State<Chat> implements ChatView {
 
   @override
   void initState() {
-    presenter = ChatPresenter(storage);
+    presenter = ChatPresenter(
+        Injector.instance.cookieStorage, Injector.instance.userProvider);
     scrollController = ScrollController();
 
     viewModel = ViewModel();
@@ -57,7 +57,7 @@ class _ChatState extends State<Chat> implements ChatView {
       controller: scrollController,
       reverse: true,
       itemBuilder: (context, index) {
-        return ChatItem(messages[index]);
+        return ChatItem(messages[index], viewModel.currentUserName);
       },
       itemCount: messages.length,
     );
@@ -82,7 +82,8 @@ class _ChatState extends State<Chat> implements ChatView {
                 color: Colors.white,
               ),
               decoration: InputDecoration(
-                border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white)),
                 hintText: "Message",
                 hintStyle: TextStyle(color: Colors.white54),
               ),
@@ -130,8 +131,9 @@ class _ChatState extends State<Chat> implements ChatView {
   }
 
   @override
-  void showChat(List<Message> messages) {
+  void showChat(User user, List<Message> messages) {
     setState(() {
+      this.viewModel.currentUserName = user.name;
       this.messages.addAll(messages.reversed);
     });
   }
@@ -161,17 +163,22 @@ class ViewModel {
   String messageText;
   bool sendEnabled = false;
   bool messageProgress = false;
+
+  String currentUserName;
 }
 
 class ChatItem extends StatelessWidget {
   final Message message;
+  final String currentUser;
 
-  const ChatItem(this.message, {Key key}) : super(key: key);
+  const ChatItem(this.message, this.currentUser, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: message.author == currentUser
+          ? Alignment.centerRight
+          : Alignment.centerLeft,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(

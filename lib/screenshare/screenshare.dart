@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:screensee/chat/chat.dart';
 import 'package:screensee/cookie.dart';
+import 'package:screensee/inject/inject.dart';
 import 'package:screensee/player/player.dart';
 import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/resolver.dart';
@@ -16,8 +17,8 @@ class ScreenShare extends StatefulWidget {
 }
 
 class _ScreenShareState extends State<ScreenShare> implements ScreenShareView {
-  final YoutubeUrlResolver urlResolver = YoutubeUrlResolver();
-  final CookieStorage cookieStorage = CookieStorage();
+  final UrlResolver urlResolver = Injector.instance.urlResolver;
+  final CookieStorage cookieStorage = Injector.instance.cookieStorage;
 
   ScreensharePresenter presenter;
   WidgetBuilder currentBuilder;

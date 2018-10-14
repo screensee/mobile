@@ -6,16 +6,19 @@ import 'package:screensee/cookie.dart';
 import 'package:screensee/room.dart';
 
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
+import 'package:screensee/user.dart';
 
 class ChatPresenter {
   final CookieStorage cookieStorage;
+  final UserProvider userProvider;
+
   ChatView view;
 
   Room room;
 
   mqtt.MqttClient client;
 
-  ChatPresenter(this.cookieStorage);
+  ChatPresenter(this.cookieStorage, this.userProvider);
 
   void initRoom(Room room) async {
     this.room = room;
@@ -27,7 +30,7 @@ class ChatPresenter {
           headers: {"Cookie": await cookieStorage.readCookies()});
 
       final messageJson = json.decode(response.body);
-      view?.showChat(readArrayFromJson(messageJson["data"]));
+      view?.showChat(await userProvider.getUser(), readArrayFromJson(messageJson["data"]));
 
       _listenMqtt();
     } catch (e) {
@@ -96,7 +99,7 @@ class ChatPresenter {
 }
 
 abstract class ChatView {
-  void showChat(List<Message> messages);
+  void showChat(User user, List<Message> messages);
   void addMessage(Message message);
 
   void showMessageProgress();

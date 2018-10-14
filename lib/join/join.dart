@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:screensee/cookie.dart';
+import 'package:screensee/inject/inject.dart';
 import 'package:screensee/join/join_presenter.dart';
 import 'package:screensee/room.dart';
 import 'package:screensee/screenshare/screenshare.dart';
@@ -15,7 +15,7 @@ class _JoinPageState extends State<JoinPage> implements JoinView {
 
   @override
   void initState() {
-    presenter = JoinPresenter(CookieStorage());
+    presenter = JoinPresenter(Injector.instance.cookieStorage);
     model = ViewModel();
 
     presenter.view = this;

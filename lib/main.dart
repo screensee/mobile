@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:screensee/cookie.dart';
 import 'package:screensee/create/create.dart';
+import 'package:screensee/inject/inject.dart';
 import 'package:screensee/join/join.dart';
 import 'package:screensee/user.dart';
 import 'package:screensee/welcome/actions.dart';
@@ -35,11 +35,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  ScreenShareUserProvider provider;
+  UserProvider provider;
 
   @override
   void initState() {
-    provider = ScreenShareUserProvider(CookieStorage());
+    provider = Injector.instance.userProvider;
     super.initState();
   }
 
