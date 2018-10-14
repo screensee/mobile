@@ -47,6 +47,14 @@ class MqttManager {
     }
   }
 
+  void publish(String topic, {String message}) {
+    final builder = new mqtt.MqttClientPayloadBuilder();
+    if (message != null) {
+      builder.addString(message);
+    }
+    _client.publishMessage(topic, mqtt.MqttQos.exactlyOnce, builder.payload);
+  }
+
   void dispose() {
     _client?.disconnect();
     _eventStream?.close();
