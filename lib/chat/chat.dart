@@ -25,8 +25,8 @@ class _ChatState extends State<Chat> implements ChatView {
 
   @override
   void initState() {
-    presenter = ChatPresenter(
-        Injector.instance.cookieStorage, Injector.instance.userProvider, Injector.instance.mqttManager);
+    presenter = ChatPresenter(Injector.instance.cookieStorage,
+        Injector.instance.userProvider, Injector.instance.mqttManager);
     scrollController = ScrollController();
 
     viewModel = ViewModel();
@@ -118,7 +118,17 @@ class _ChatState extends State<Chat> implements ChatView {
   @override
   void addMessage(Message message) {
     setState(() {
-      messages.insert(0, message);
+      bool alreadyAdded = false;
+      for (Message displayedMessage in messages) {
+        if (displayedMessage.id == message.id) {
+          alreadyAdded = true;
+          break;
+        }
+      }
+
+      if (!alreadyAdded) {
+        messages.insert(0, message);
+      }
 
       textController.clear();
 
