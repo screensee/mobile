@@ -1,8 +1,3 @@
-# screensee
+# ScreenSee
 
-A new Flutter project.
-
-## Getting Started
-
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+App for collaborative and sync video watch platform.
